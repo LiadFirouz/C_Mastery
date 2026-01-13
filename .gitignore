@@ -1,0 +1,16 @@
+# Windows Executables
+*.exe
+*.dll
+
+# Mac/Linux Executables
+*.out
+*.app
+
+# Object files (קבצי ביניים של הקומפיילר)
+*.o
+
+# Mac System Files (זבל שמק משאיר בתיקיות)
+.DS_Store
+
+# VS Code Local Settings (הגדרות אישיות שלך שלא צריכות לעלות לענן)
+.vscode/
