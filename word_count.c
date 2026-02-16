@@ -4,14 +4,18 @@
 #include <stdio.h>
 
 int main(){
-    int c, nl, nw, nc;
+    int c, nl, nw, nc, state;
 
-    nl=0, nw=0, nc=0;
+    nl=0, nw=0, nc=0, state = OUT;
     while ((c=getchar()) != EOF){
-        if(c == '\n')
+        if(c == '\n' || c == '\t' || c == ' ')
             ++nl;
         if(c == ' ')
-            nw++;
+            state = OUT;
+        if(state == OUT && c != ' '){
+            ++nw;
+            state = IN;
+        }
         nc++;
 
     }
