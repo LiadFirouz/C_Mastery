@@ -25,7 +25,49 @@ void printUsers(User* head);
 void deleteUser(User** head, int id);
 void freeList(User* head);
 
-int main(){
+int main() {
+    printf("---------WELCOME TO BIT-GUARD---------\n");
+    
+    // 1. THIS is the actual start of your list. A single pointer.
+    User *head = NULL; 
+    
+    int user_choice;
+
+    do {
+        printf("\nEnter your choice:\n1. Add user\n2. Delete user\n3. Toggle permission\n4. Print users\n0. Exit Program\nChoice: ");
+        scanf("%d", &user_choice);        
+        
+        // Clear the buffer safely
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF);
+
+        // 2. Use a switch statement for clean menu routing
+        switch (user_choice) {
+            case 1:
+                // We pass the ADDRESS of the single pointer, which effectively makes it a User**
+                addUser(&head); 
+                break;
+            case 2:
+                // TODO: How will you ask the user for the ID they want to delete?
+                // TODO: Call deleteUser()
+                break;
+            case 3:
+                // TODO: Ask for the ID. Ask for the mask. 
+                // TODO: Call togglePermission()
+                break;
+            case 4:
+                // Notice printUsers only needs to READ the list, so it takes User*, not User**
+                printUsers(head);
+                break;
+            case 0:
+                printf("Exiting program...\n");
+                // DANGER: What must you do here before the program closes to prevent a memory leak?
+                break;
+            default:
+                printf("Invalid choice. Please enter a number between 0 and 4.\n");
+        }
+        
+    } while(user_choice != 0);
 
     return 0;
 }
@@ -33,6 +75,7 @@ int main(){
 void addUser(User** head){
     // allocate new memory
     User* newUser = (User*)malloc(sizeof(User));
+    newUser->permissions = 0;
 
     // check if the pointer is point on the new memory
     if(newUser == NULL){
@@ -69,16 +112,77 @@ void togglePermission (User* head, int id, unsigned char mask){
         if(pointer->id == id){
            pointer->permissions ^= mask;
         }
+        pointer = pointer->next;
     }
 
     printf("User with ID %d not found.\n", id);
 }
 
 void printUsers(User* head){
-    
+    User *pointer = head;
+    int total_bits = sizeof(pointer->permissions) * 8;
+
+    while(pointer != NULL){
+        printf("User id = %d\n\tpermission =", pointer->id);
+        for(int i=total_bits-1; i>=0 ; i--){
+            int current_bit = (pointer->permissions >> i) & 1;
+            printf("%d", current_bit);
+        }
+        pointer = pointer->next;
+
+    }
 }
 
+void deleteUser(User** head, int id){
+    
+    // Senerio I: list is empty
+    if (*head == NULL) {
+        printf("List is empty. Cannot delete user %d.\n", id);
+        return;
+    }
+    
+    User * current = *head;
+    User * previous = NULL;
 
+    // Senerio II: The node to delete is the HEAD node
+    if(current != NULL && current->id == id){
+        *head = current->next;
+        free(current);
+        printf("User ID %d deleted successfully.\n", id);
+        return;
+    }
+
+    // Senerio III: Traverse the list to find the node
+    if(current != NULL && current->id != id){
+        previous = current;
+        current = current ->next;
+    }
+
+    if (current == NULL) {
+        printf("User with ID %d not found.\n", id);
+        return;
+    }
+    
+    // Unlink the node from the linked list
+    previous->next = current->next;
+    
+    // Free the isolated node from memory
+    free(current);
+    printf("User ID %d deleted successfully.\n", id);
+
+}
+
+void freeList(User* head){
+    User * pointer = head;
+    User * next;
+
+    while(pointer != NULL){
+        next = pointer->next;
+        free(pointer);
+        pointer = next;
+
+    }
+}
 
 
 
