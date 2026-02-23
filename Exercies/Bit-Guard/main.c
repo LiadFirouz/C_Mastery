@@ -47,14 +47,44 @@ int main() {
                 // We pass the ADDRESS of the single pointer, which effectively makes it a User**
                 addUser(&head); 
                 break;
-            case 2:
+            case 2:{
                 // TODO: How will you ask the user for the ID they want to delete?
                 // TODO: Call deleteUser()
+
+                // get user id
+                int userId = 0;
+                printf("Enter The User ID That you want to delete: ");
+                scanf("%d", &userId);
+
+                // clear the Enter from the last input
+                while (getchar() != '\n');
+
+                deleteUser(&head, userId);
+
                 break;
-            case 3:
+            }
+            case 3:{
                 // TODO: Ask for the ID. Ask for the mask. 
                 // TODO: Call togglePermission()
+
+                // get user id
+                int userId = 0;
+                printf("Enter The User ID That you want to toggle: ");
+                scanf("%d", &userId);
+                // clear the Enter from the last input
+                while (getchar() != '\n');
+
+                int temp = 0;
+                printf("Enter mask: ");
+                scanf("%d", &temp);
+                // clear the Enter from the last input
+                while (getchar() != '\n');  
+                unsigned char mask = (unsigned char) temp;
+
+                togglePermission(&head, userId, mask);
+
                 break;
+            }
             case 4:
                 // Notice printUsers only needs to READ the list, so it takes User*, not User**
                 printUsers(head);
@@ -62,6 +92,7 @@ int main() {
             case 0:
                 printf("Exiting program...\n");
                 // DANGER: What must you do here before the program closes to prevent a memory leak?
+                freeList(head);
                 break;
             default:
                 printf("Invalid choice. Please enter a number between 0 and 4.\n");
@@ -75,13 +106,13 @@ int main() {
 void addUser(User** head){
     // allocate new memory
     User* newUser = (User*)malloc(sizeof(User));
-    newUser->permissions = 0;
-
+    
     // check if the pointer is point on the new memory
     if(newUser == NULL){
         printf("Error: Memory allocation failed!\n");
-        return;
+        exit(1);
     }
+    newUser->permissions = 0;
 
     // get user id
     printf("Enter User ID: ");
@@ -109,9 +140,9 @@ void togglePermission (User* head, int id, unsigned char mask){
     User *pointer = head;
 
     while(pointer != NULL){
-        if(pointer->id == id){
-           pointer->permissions ^= mask;
-        }
+        if(pointer->id == id)
+        pointer->permissions ^= mask;
+        
         pointer = pointer->next;
     }
 
@@ -129,8 +160,8 @@ void printUsers(User* head){
             printf("%d", current_bit);
         }
         pointer = pointer->next;
-
     }
+    printf("END OF LIST");
 }
 
 void deleteUser(User** head, int id){
@@ -153,7 +184,7 @@ void deleteUser(User** head, int id){
     }
 
     // Senerio III: Traverse the list to find the node
-    if(current != NULL && current->id != id){
+    while(current != NULL && current->id != id){
         previous = current;
         current = current ->next;
     }
