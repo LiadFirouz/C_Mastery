@@ -12,9 +12,8 @@ int main(){
         string[strcspn(string, "\n")] = '\0';
         printf("The Input string:\n\"%s\"\n", string);
         remove_blanks(string);
-        printf("The string at the end of the function:\n\"%s\"\n", string);
+        printf("The string at the end of the function:\n\"%s\"\n\n\n", string);
     }
-
     return 0;
 }
 
