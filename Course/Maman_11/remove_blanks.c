@@ -1,3 +1,10 @@
+/*
+ * Name: Liad Firouz
+ * ID: 209187699
+ * File: remove_blanks.c
+ * Description: A program that takes a given text from the user and deletes all the spaces in it.
+ */
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -19,6 +26,15 @@ int main(void)
     }
     return 0;
 }
+
+/*
+ * Function: remove_blanks
+ * -------------------
+ * Iterates through a string and removes all whitespace characters 
+ * (spaces, tabs, newlines) by shifting valid characters to the left.
+ * Modifies the string in-place.
+ * * *string: A pointer to the null-terminated string to be processed.
+ */
 
 void remove_blanks(char *string)
 {
