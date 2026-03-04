@@ -19,7 +19,7 @@ int main(void)
     int i = 0, num1 = 0, num2 = 0, diff = 0, sum = 0, count = 0;
     int *arr = NULL;
 
-    printf("Please enter 2 number for diffrence and sum:");
+    printf("Please enter 2 number for diffrence and sum:\n");
 
     while (scanf("%d %d", &num1, &num2) != EOF)
     {
