@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-// Complex Structer
+/* Complex Structer*/
 typedef struct complex
 {
     double real;
@@ -18,6 +18,5 @@ void mult_comp_real(complex a, double d);
 void mult_comp_img(complex a, double d);
 void mult_comp_comp(complex a, complex b);
 void abs_comp(complex n);
-
 
 #endif
