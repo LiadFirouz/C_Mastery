@@ -1,15 +1,23 @@
+/*
+ * complex.h
+ * * Header file defining the 'complex' structure and the mathematical API.
+ * Acts as the blueprint for the complex number math engine.
+ */
 #ifndef COMPLEX_H
 #define COMPLEX_H
 
-#include <stdio.h>
-
-/* Complex Structer*/
+/*
+ * The complex number structure.
+ * Note: Initialization happens at run-time, not compile-time,
+ * to strictly comply with the ANSI C89 standard.
+ */
 typedef struct complex
 {
     double real;
     double imaginary;
 } complex;
 
+/* Function Prototypes */
 void read_comp(complex *c, double r, double i);
 void print_comp(complex c);
 void add_comp(complex a, complex b);
