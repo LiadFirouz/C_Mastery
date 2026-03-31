@@ -9,8 +9,12 @@
 #include "complex.h"
 
 #define MAX 100
+#define TRUE 1
+#define FALSE 0
 
 /* Helper function prototype */
+void skip_spaces(char **p);
+int isValidCommand(char *command);
 complex *get_var(char name, complex *vars[]);
 
 int main(void)
@@ -19,14 +23,18 @@ int main(void)
      * Placed strictly at the top of the block to comply with ANSI C89.
      */
     complex A = {0, 0}, B = {0, 0}, C = {0, 0}, D = {0, 0}, E = {0, 0}, F = {0, 0};
-    complex *vars[6], *target, *target2;
+    complex *vars[6], *target;
 
     char line[MAX], command[MAX], extra[MAX];
-    char varName, varName2;
-    double n1, n2;
+    /*char varName, varName2;
+    double n1, n2;*/
     int args;
 
-    /* Initialize the pointer map for O(1) variable access via ASCII math */
+    char *p;
+    int offset;
+    /*char *endptr;*/
+
+    /* Initialize the pointer map for O(1) variable access via ASCII math*/
     vars[0] = &A;
     vars[1] = &B;
     vars[2] = &C;
@@ -47,169 +55,151 @@ int main(void)
         printf("You entered: %s", line);
 
         /* Extract the command verb. Skip empty lines (Ghost line fix). */
-        if (sscanf(line, "%s", command) < 1)
+        if (sscanf(line, "%s%n", command, &offset) < 1)
             continue;
 
-        /* --- Command Routing & Parsing --- */
+        if (isValidCommand(command) == FALSE)
+            continue;
+
+        p = line + offset;
+
+        /* --- Command Routing & Parsing ---*/
         if (strcmp(command, "stop") == 0)
         {
-            /* Check if user typed garbage after the stop command */
+            /* Check if user typed garbage after the stop command*/
             args = sscanf(line, "%s %s", command, extra);
             if (args == 2)
                 printf("Extraneous text after end of command\n");
 
             else
-                break; /* Exit the program */
+                break; /* Exit the program*/
         }
 
         else if (strcmp(command, "read_comp") == 0)
         {
-            /* Expects: string, char, comma, double, comma, double */
-            args = sscanf(line, "%s %c , %lf , %lf %s", command, &varName, &n1, &n2, extra);
-
-            if (args == 5)
-                printf("Extraneous text after end of command\n");
-
-            else if (args != 4)
-                printf("Missing parameter\n");
-            else
-            {
-                target = get_var(varName, vars);
-                if (target != NULL)
-                    read_comp(target, n1, n2);
-            }
         }
 
         else if (strcmp(command, "print_comp") == 0)
         {
-            /* Expects: string, char */
-            args = sscanf(line, "%s %c %s", command, &varName, extra);
-
-            if (args == 3)
-                printf("Extraneous text after end of command\n");
-
-            else if (args != 2)
-                printf("Missing parameter\n");
-
-            else
+            skip_spaces(&p);
+            if (*p == ',')
             {
-                target = get_var(varName, vars);
-                if (target != NULL)
-                    print_comp(*target);
+                printf("Illegal comma\n");
+                continue;
             }
+
+            if (*p == '\0' || *p == '\n')
+            {
+                printf("Missing parameter\n");
+                continue;
+            }
+
+            target = get_var(*p++, vars);
+            if (target == NULL)
+                continue;
+
+            skip_spaces(&p);
+            if (*p != '\n' && *p != '\0')
+            {
+                printf("Extraneous text after end of command\n");
+                continue;
+            }
+
+            print_comp(*target);
         }
 
         else if (strcmp(command, "add_comp") == 0)
         {
-            /* Expects: string, char, comma, char */
-            args = sscanf(line, "%s %c , %c %s", command, &varName, &varName2, extra);
-
-            if (args == 4)
-                printf("Extraneous text after end of command\n");
-
-            else if (args != 3)
-                printf("Missing parameter\n");
-            else
-            {
-                target = get_var(varName, vars);
-                target2 = get_var(varName2, vars);
-                if (target != NULL && target2 != NULL)
-                    add_comp(*target, *target2);
-            }
         }
 
         else if (strcmp(command, "sub_comp") == 0)
         {
-            args = sscanf(line, "%s %c , %c %s", command, &varName, &varName2, extra);
-
-            if (args == 4)
-                printf("Extraneous text after end of command\n");
-
-            else if (args != 3)
-                printf("Missing parameter\n");
-            else
-            {
-                target = get_var(varName, vars);
-                target2 = get_var(varName2, vars);
-                if (target != NULL && target2 != NULL)
-                    sub_comp(*target, *target2);
-            }
         }
 
         else if (strcmp(command, "mult_comp_real") == 0)
         {
-            /* Expects: string, char, comma, double */
-            args = sscanf(line, "%s %c , %lf %s", command, &varName, &n1, extra);
-
-            if (args == 4)
-                printf("Extraneous text after end of command\n");
-
-            else if (args != 3)
-                printf("Missing parameter\n");
-            else
-            {
-                target = get_var(varName, vars);
-                if (target != NULL)
-                    mult_comp_real(*target, n1);
-            }
         }
 
         else if (strcmp(command, "mult_comp_img") == 0)
         {
-            args = sscanf(line, "%s %c , %lf %s", command, &varName, &n1, extra);
-
-            if (args == 4)
-                printf("Extraneous text after end of command\n");
-
-            else if (args != 3)
-                printf("Missing parameter\n");
-            else
-            {
-                target = get_var(varName, vars);
-                if (target != NULL)
-                    mult_comp_img(*target, n1);
-            }
         }
 
         else if (strcmp(command, "mult_comp_comp") == 0)
         {
-            args = sscanf(line, "%s %c , %c %s", command, &varName, &varName2, extra);
-
-            if (args == 4)
-                printf("Extraneous text after end of command\n");
-
-            else if (args != 3)
-                printf("Missing parameter\n");
-            else
-            {
-                target = get_var(varName, vars);
-                target2 = get_var(varName2, vars);
-                if (target != NULL && target2 != NULL)
-                    mult_comp_comp(*target, *target2);
-            }
         }
 
         else if (strcmp(command, "abs_comp") == 0)
         {
-            args = sscanf(line, "%s %c %s", command, &varName, extra);
-
-            if (args == 3)
-                printf("Extraneous text after end of command\n");
-
-            else if (args != 2)
-                printf("Missing parameter\n");
-            else
+            skip_spaces(&p);
+            if (*p == ',')
             {
-                target = get_var(varName, vars);
-                if (target != NULL)
-                    abs_comp(*target);
+                printf("Illegal comma\n");
+                continue;
             }
+
+            if (*p == '\0' || *p == '\n')
+            {
+                printf("Missing parameter\n");
+                continue;
+            }
+
+            target = get_var(*p++, vars);
+            if (target == NULL)
+                continue;
+
+            skip_spaces(&p);
+            if (*p != '\n' && *p != '\0')
+            {
+                printf("Extraneous text after end of command\n");
+                continue;
+            }
+
+            abs_comp(*target);
         }
 
         else
             printf("Undefined command name\n");
     }
+
     return 0;
+}
+
+void skip_spaces(char **p)
+{
+    while (**p == ' ' || **p == '\t')
+        (*p)++;
+}
+
+/*
+ * isValidCommand:
+ * Validates if the given string matches any of the system's known commands.
+ * Uses a lookup table (array) for scalable and clean command verification.
+ * * Parameters:
+ * command - The command string extracted from the user's input.
+ * * Returns:
+ * 1 (True) if the command is valid, 0 (False) otherwise.
+ */
+int isValidCommand(char *command)
+{
+    /* Lookup table containing all legal operations in the system */
+    char *valid_commands[] = {
+        "read_comp", "print_comp", "add_comp", "sub_comp",
+        "mult_comp_real", "mult_comp_img", "mult_comp_comp",
+        "abs_comp", "stop"};
+    int i = 0;
+
+    /* * Safely calculate the number of elements in the array.
+     * Total array size (bytes) divided by the size of a single pointer.
+     */
+    int num_elements = sizeof(valid_commands) / sizeof(valid_commands[0]);
+
+    /* Scan the lookup table for an exact string match */
+    for (i = 0; i < num_elements; i++)
+        if (strcmp(command, valid_commands[i]) == 0)
+            return TRUE; /* Match found - valid command */
+
+    printf("Undefined command name\n");
+    return FALSE;
 }
 
 /*
@@ -220,7 +210,6 @@ int main(void)
 complex *get_var(char name, complex *vars[])
 {
     if (name >= 'A' && name <= 'F')
-        /* Calculate array index using ASCII subtraction */
         return vars[name - 'A'];
 
     printf("Undefined complex variable\n");
