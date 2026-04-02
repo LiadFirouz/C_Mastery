@@ -13,6 +13,10 @@
 #define FALSE 0
 
 /* Helper function prototype */
+complex *extract_single_arg(char **p, complex *vars[]);
+int check_illegal_comma(char c);
+int check_missing_parameter(char c);
+int check_extraneous_text(char c);
 void skip_spaces(char **p);
 int isValidCommand(char *command);
 complex *get_var(char name, complex *vars[]);
@@ -27,12 +31,10 @@ int main(void)
 
     char line[MAX], command[MAX], extra[MAX];
     /*char varName, varName2;
-    double n1, n2;*/
+    double n1;    char *endptr;*/
     int args;
-
     char *p;
     int offset;
-    /*char *endptr;*/
 
     /* Initialize the pointer map for O(1) variable access via ASCII math*/
     vars[0] = &A;
@@ -81,31 +83,11 @@ int main(void)
 
         else if (strcmp(command, "print_comp") == 0)
         {
-            skip_spaces(&p);
-            if (*p == ',')
+            target = extract_single_arg(&p, vars);
+            if (target != NULL)
             {
-                printf("Illegal comma\n");
-                continue;
+                print_comp(*target);
             }
-
-            if (*p == '\0' || *p == '\n')
-            {
-                printf("Missing parameter\n");
-                continue;
-            }
-
-            target = get_var(*p++, vars);
-            if (target == NULL)
-                continue;
-
-            skip_spaces(&p);
-            if (*p != '\n' && *p != '\0')
-            {
-                printf("Extraneous text after end of command\n");
-                continue;
-            }
-
-            print_comp(*target);
         }
 
         else if (strcmp(command, "add_comp") == 0)
@@ -118,6 +100,11 @@ int main(void)
 
         else if (strcmp(command, "mult_comp_real") == 0)
         {
+            /*target = extract_double_arg(&p, vars, &n1);
+            if (target != NULL)
+            {
+                mult_comp_real(*target, n1);
+            }*/
         }
 
         else if (strcmp(command, "mult_comp_img") == 0)
@@ -130,31 +117,11 @@ int main(void)
 
         else if (strcmp(command, "abs_comp") == 0)
         {
-            skip_spaces(&p);
-            if (*p == ',')
+            target = extract_single_arg(&p, vars);
+            if (target != NULL)
             {
-                printf("Illegal comma\n");
-                continue;
+                abs_comp(*target);
             }
-
-            if (*p == '\0' || *p == '\n')
-            {
-                printf("Missing parameter\n");
-                continue;
-            }
-
-            target = get_var(*p++, vars);
-            if (target == NULL)
-                continue;
-
-            skip_spaces(&p);
-            if (*p != '\n' && *p != '\0')
-            {
-                printf("Extraneous text after end of command\n");
-                continue;
-            }
-
-            abs_comp(*target);
         }
 
         else
@@ -164,10 +131,203 @@ int main(void)
     return 0;
 }
 
+complex *extract_double_arg(char **p, complex *vars[], double *n1_out)
+{
+    complex *target;
+    char *endptr, varName;
+    double n1;
+
+    /* Fast-forward through any spaces immediately following the command */
+    skip_spaces(p);
+
+    /* The print_comp command takes a single variable; commas are strictly forbidden */
+    if (**p == ',')
+    {
+        printf("Illegal comma\n");
+        return NULL;
+    }
+
+    /* Ensure the user didn't just press Enter without providing a variable */
+    if (**p == '\0' || **p == '\n')
+    {
+        printf("Missing parameter\n");
+        return NULL;
+    }
+
+    /* Extract the variable letter safely */
+    varName = **p;
+    /* Safely advance the underlying char* pointer */
+    (*p)++;
+
+    /* * Extract the variable character, advance the pointer to the next character,
+     * and map it to the actual complex number memory address.
+     */
+    target = get_var(varName, vars);
+
+    /* Abort operation if the variable was out of bounds (handled by get_var) */
+    if (target == NULL)
+        return NULL;
+
+    /* Fast-forward through any spaces immediately following the command */
+    skip_spaces(p);
+
+    if (**p == '\0' || **p == '\n')
+    {
+        printf("Missing parameter\n");
+        return NULL;
+    }
+    if (**p != ',')
+    {
+        printf("Missing comma\n");
+        return NULL;
+    }
+    (*p)++;
+
+    /* Fast-forward through any spaces immediately following the command */
+    skip_spaces(p);
+
+    if (**p == ',')
+    {
+        printf("Multiple consecutive commas\n");
+        return NULL;
+    }
+
+    if (**p == '\0' || **p == '\n')
+    {
+        printf("Missing parameter\n");
+        return NULL;
+    }
+
+    n1 = strtod(*p, &endptr);
+
+    if (*p == endptr)
+    {
+        printf("Invalid parameter - not a number\n");
+        return NULL;
+    }
+    *p = endptr;
+
+    /* Skip any trailing spaces after the valid variable */
+    skip_spaces(p);
+
+    /* * Validate that nothing else was typed after the variable.
+     * This strictly catches garbage text or illegal trailing commas (e.g., "print_comp A ,").
+     */
+    if (**p != '\n' && **p != '\0')
+    {
+        printf("Extraneous text after end of command\n");
+        return NULL;
+    }
+
+    *n1_out = n1;
+    return target;
+}
+
+/*
+ * extract_single_arg:
+ * Parses a command line that strictly requires exactly one complex variable parameter.
+ * It utilizes validation helpers to enforce syntax rules (no commas, no empty inputs, no trailing garbage).
+ * * Parameters:
+ * p    - A double pointer to the current position in the command string.
+ * vars - The array of pointers to the system's complex variables (A-F).
+ * * Returns:
+ * A pointer to the requested complex variable if parsing succeeds.
+ * NULL if any syntax error occurs or if the variable is undefined.
+ */
+complex *extract_single_arg(char **p, complex *vars[])
+{
+    complex *target;
+    char varName;
+
+    /* Fast-forward to the first meaningful character of the parameter */
+    skip_spaces(p);
+
+    /* Enforce strict single-parameter syntax: reject unexpected commas and empty inputs */
+    if (check_illegal_comma(**p))
+        return NULL;
+    if (check_missing_parameter(**p))
+        return NULL;
+
+    /* Extract the variable identifier and advance the main parsing pointer */
+    varName = **p;
+    (*p)++;
+
+    /* Map the identifier (e.g., 'A') to its actual memory address */
+    target = get_var(varName, vars);
+    if (target == NULL)
+        return NULL;
+
+    /* Fast-forward past the valid variable to inspect the end of the line */
+    skip_spaces(p);
+
+    /* Guarantee no additional arguments or garbage text follow the variable */
+    if (check_extraneous_text(**p))
+        return NULL;
+
+    /* All validations passed - return the safely extracted variable */
+    return target;
+}
+
+/*
+ * check_illegal_comma:
+ * Validates that the current character is not an unexpected comma.
+ * Used to enforce strict syntax in commands that do not accept multiple parameters.
+ * Returns: 1 if an illegal comma is detected (and prints an error), 0 otherwise.
+ */
+int check_illegal_comma(char c)
+{
+    if (c == ',')
+    {
+        printf("Illegal comma\n");
+        return 1;
+    }
+    return 0;
+}
+
+/*
+ * check_missing_parameter:
+ * Checks if the command string has ended prematurely before a required argument.
+ * Detects null terminators ('\0') or newline characters ('\n').
+ * Returns: 1 if a parameter is missing (and prints an error), 0 otherwise.
+ */
+int check_missing_parameter(char c)
+{
+    if (c == '\0' || c == '\n')
+    {
+        printf("Missing parameter\n");
+        return 1;
+    }
+    return 0;
+}
+
+/*
+ * check_extraneous_text:
+ * Ensures the command line terminates cleanly after all arguments are parsed.
+ * Any character other than a newline or null terminator is considered garbage.
+ * Returns: 1 if extra text/garbage is found (and prints an error), 0 otherwise.
+ */
+int check_extraneous_text(char c)
+{
+    if (c != '\n' && c != '\0')
+    {
+        printf("Extraneous text after end of command\n");
+        return 1;
+    }
+    return 0;
+}
+
+/*
+ * skip_spaces:
+ * Fast-forwards the parsing pointer past any spaces or tab characters.
+ * Uses a double pointer (char **) to permanently advance the position
+ * of the pointer within the calling function's context.
+ */
 void skip_spaces(char **p)
 {
     while (**p == ' ' || **p == '\t')
+    {
         (*p)++;
+    }
 }
 
 /*
