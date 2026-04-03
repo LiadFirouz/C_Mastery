@@ -13,7 +13,12 @@
 #define FALSE 0
 
 /* Helper function prototype */
+complex *extract_two_vars(char **p, complex *vars[], complex **target2_out);
+complex *extract_read_args(char **p, complex *vars[], double *n1_out, double *n2_out);
+complex *extract_double_arg(char **p, complex *vars[], double *n1_out);
 complex *extract_single_arg(char **p, complex *vars[]);
+int check_missing_comma(char c);
+int check_multiple_comma(char c);
 int check_illegal_comma(char c);
 int check_missing_parameter(char c);
 int check_extraneous_text(char c);
@@ -27,11 +32,10 @@ int main(void)
      * Placed strictly at the top of the block to comply with ANSI C89.
      */
     complex A = {0, 0}, B = {0, 0}, C = {0, 0}, D = {0, 0}, E = {0, 0}, F = {0, 0};
-    complex *vars[6], *target;
+    complex *vars[6], *target, *target2;
 
     char line[MAX], command[MAX], extra[MAX];
-    /*char varName, varName2;
-    double n1;    char *endptr;*/
+    double n1, n2;
     int args;
     char *p;
     int offset;
@@ -79,6 +83,11 @@ int main(void)
 
         else if (strcmp(command, "read_comp") == 0)
         {
+            target = extract_read_args(&p, vars, &n1, &n2);
+            if (target != NULL)
+            {
+                read_comp(target, n1, n2);
+            }
         }
 
         else if (strcmp(command, "print_comp") == 0)
@@ -92,27 +101,47 @@ int main(void)
 
         else if (strcmp(command, "add_comp") == 0)
         {
+            target = extract_two_vars(&p, vars, &target2);
+            if (target != NULL)
+            {
+                add_comp(*target, *target2);
+            }
         }
 
         else if (strcmp(command, "sub_comp") == 0)
         {
+            target = extract_two_vars(&p, vars, &target2);
+            if (target != NULL)
+            {
+                sub_comp(*target, *target2);
+            }
         }
 
         else if (strcmp(command, "mult_comp_real") == 0)
         {
-            /*target = extract_double_arg(&p, vars, &n1);
+            target = extract_double_arg(&p, vars, &n1);
             if (target != NULL)
             {
                 mult_comp_real(*target, n1);
-            }*/
+            }
         }
 
         else if (strcmp(command, "mult_comp_img") == 0)
         {
+            target = extract_double_arg(&p, vars, &n1);
+            if (target != NULL)
+            {
+                mult_comp_img(*target, n1);
+            }
         }
 
         else if (strcmp(command, "mult_comp_comp") == 0)
         {
+            target = extract_two_vars(&p, vars, &target2);
+            if (target != NULL)
+            {
+                mult_comp_comp(*target, *target2);
+            }
         }
 
         else if (strcmp(command, "abs_comp") == 0)
@@ -131,94 +160,292 @@ int main(void)
     return 0;
 }
 
+complex *extract_two_vars(char **p, complex *vars[], complex **target2_out)
+{
+    complex *target, *target2;
+    char varName;
+
+    /* --- Stage 1: Variable Extraction --- */
+
+    /* Fast-forward to the first meaningful character */
+    skip_spaces(p);
+
+    /* Ensure the string doesn't start with a stray comma or end prematurely */
+    if (check_illegal_comma(**p))
+        return NULL;
+    if (check_missing_parameter(**p))
+        return NULL;
+
+    /* Extract the variable identifier (e.g., 'A') and advance the pointer */
+    varName = **p;
+    (*p)++;
+
+    /* Map the identifier to its actual memory address */
+    target = get_var(varName, vars);
+    if (target == NULL)
+        return NULL;
+
+    /* --- Stage 2: First Comma Validation --- */
+
+    /* Fast-forward to locate the mandatory separating comma */
+    skip_spaces(p);
+    if (check_missing_parameter(**p))
+        return NULL;
+    if (check_missing_comma(**p))
+        return NULL;
+
+    /* Hop over the valid comma */
+    (*p)++;
+
+    /* --- Stage 3: First Number (Real Part) Extraction --- */
+
+    /* Fast-forward past the comma to locate the real number */
+    skip_spaces(p);
+    if (check_multiple_comma(**p))
+        return NULL;
+    if (check_missing_parameter(**p))
+        return NULL;
+
+    /* Extract second variable identifier and advance */
+    varName = **p;
+    (*p)++;
+
+    target2 = get_var(varName, vars);
+    if (target2 == NULL)
+        return NULL;
+
+    /* --- Stage 4: Final Validation --- */
+
+    skip_spaces(p);
+    if (check_extraneous_text(**p))
+        return NULL;
+
+    /* All validations passed - export both numbers and return the variable pointer */
+    *target2_out = target2;
+    return target;
+}
+
+/*
+ * extract_read_args:
+ * Parses a command line that requires exactly three arguments: a complex variable and two real numbers.
+ * Expected strict syntax: [Variable] , [Real Number] , [Imaginary Number] (e.g., "A, -3.5, 4.2").
+ * It utilizes validation helpers to enforce comma placement, prevent missing parameters,
+ * and block trailing garbage.
+ * * Parameters:
+ * p      - A double pointer to the current position in the command string.
+ * vars   - The array of pointers to the system's complex variables (A-F).
+ * n1_out - Pointer to a double where the parsed real part will be safely stored upon success.
+ * n2_out - Pointer to a double where the parsed imaginary part will be safely stored upon success.
+ * * Returns:
+ * A pointer to the requested complex variable if parsing succeeds.
+ * NULL if any syntax error occurs, if the variable is undefined, or if the numbers are invalid.
+ */
+complex *extract_read_args(char **p, complex *vars[], double *n1_out, double *n2_out)
+{
+    complex *target;
+    char *endptr, varName;
+    double n1, n2;
+
+    /* --- Stage 1: Variable Extraction --- */
+
+    /* Fast-forward to the first meaningful character */
+    skip_spaces(p);
+
+    /* Ensure the string doesn't start with a stray comma or end prematurely */
+    if (check_illegal_comma(**p))
+        return NULL;
+    if (check_missing_parameter(**p))
+        return NULL;
+
+    /* Extract the variable identifier (e.g., 'A') and advance the pointer */
+    varName = **p;
+    (*p)++;
+
+    /* Map the identifier to its actual memory address */
+    target = get_var(varName, vars);
+    if (target == NULL)
+        return NULL;
+
+    /* --- Stage 2: First Comma Validation --- */
+
+    /* Fast-forward to locate the mandatory separating comma */
+    skip_spaces(p);
+
+    /* Ensure the command didn't end before the comma, and verify the comma exists */
+    if (check_missing_parameter(**p))
+        return NULL;
+    if (check_missing_comma(**p))
+        return NULL;
+
+    /* Hop over the valid comma */
+    (*p)++;
+
+    /* --- Stage 3: First Number (Real Part) Extraction --- */
+
+    /* Fast-forward past the comma to locate the real number */
+    skip_spaces(p);
+
+    /* Reject multiple consecutive commas (e.g., "A,,5") and check for unexpected EOF */
+    if (check_multiple_comma(**p))
+        return NULL;
+    if (check_missing_parameter(**p))
+        return NULL;
+
+    /* Attempt to extract a double-precision floating-point number */
+    n1 = strtod(*p, &endptr);
+
+    /* If the pointer didn't move, no valid number was found */
+    if (*p == endptr)
+    {
+        printf("Invalid parameter - not a number\n");
+        return NULL;
+    }
+
+    /* Advance the main parsing pointer past the extracted number */
+    *p = endptr;
+
+    /* --- Stage 4: Second Comma Validation --- */
+
+    /* Fast-forward to locate the mandatory separating comma */
+    skip_spaces(p);
+
+    /* Ensure the command didn't end before the comma, and verify the comma exists */
+    if (check_missing_parameter(**p))
+        return NULL;
+    if (check_missing_comma(**p))
+        return NULL;
+
+    /* Hop over the valid comma */
+    (*p)++;
+
+    /* --- Stage 5: Second Number (Imaginary Part) Extraction --- */
+
+    /* Fast-forward past the comma to locate the real number */
+    skip_spaces(p);
+
+    /* Reject multiple consecutive commas and check for unexpected EOF */
+    if (check_multiple_comma(**p))
+        return NULL;
+    if (check_missing_parameter(**p))
+        return NULL;
+
+    /* Attempt to extract the second double-precision floating-point number */
+    n2 = strtod(*p, &endptr);
+
+    /* If the pointer didn't move, no valid number was found */
+    if (*p == endptr)
+    {
+        printf("Invalid parameter - not a number\n");
+        return NULL;
+    }
+
+    /* Advance the main parsing pointer past the extracted number */
+    *p = endptr;
+
+    /* --- Stage 6: Final Validation --- */
+
+    /* Fast-forward past the number to inspect the end of the line */
+    skip_spaces(p);
+
+    /* Guarantee no additional arguments or garbage text follow the number */
+    if (check_extraneous_text(**p))
+        return NULL;
+
+    /* All validations passed - export both numbers and return the variable pointer */
+    *n1_out = n1;
+    *n2_out = n2;
+
+    return target;
+}
+
+/*
+ * extract_double_arg:
+ * Parses a command line that requires exactly two arguments: a complex variable and a real number.
+ * Expected strict syntax: [Variable] , [Real Number] (e.g., "A, 5.5").
+ * It utilizes validation helpers to enforce comma placement, prevent missing parameters,
+ * and block trailing garbage.
+ * * Parameters:
+ * p      - A double pointer to the current position in the command string.
+ * vars   - The array of pointers to the system's complex variables (A-F).
+ * n1_out - Pointer to a double where the parsed real number will be safely stored upon success.
+ * * Returns:
+ * A pointer to the requested complex variable if parsing succeeds.
+ * NULL if any syntax error occurs, if the variable is undefined, or if the number is invalid.
+ */
 complex *extract_double_arg(char **p, complex *vars[], double *n1_out)
 {
     complex *target;
     char *endptr, varName;
     double n1;
 
-    /* Fast-forward through any spaces immediately following the command */
+    /* --- Stage 1: Variable Extraction --- */
+
+    /* Fast-forward to the first meaningful character */
     skip_spaces(p);
 
-    /* The print_comp command takes a single variable; commas are strictly forbidden */
-    if (**p == ',')
-    {
-        printf("Illegal comma\n");
+    /* Ensure the string doesn't start with a stray comma or end prematurely */
+    if (check_illegal_comma(**p))
         return NULL;
-    }
-
-    /* Ensure the user didn't just press Enter without providing a variable */
-    if (**p == '\0' || **p == '\n')
-    {
-        printf("Missing parameter\n");
+    if (check_missing_parameter(**p))
         return NULL;
-    }
 
-    /* Extract the variable letter safely */
+    /* Extract the variable identifier (e.g., 'A') and advance the pointer */
     varName = **p;
-    /* Safely advance the underlying char* pointer */
     (*p)++;
 
-    /* * Extract the variable character, advance the pointer to the next character,
-     * and map it to the actual complex number memory address.
-     */
+    /* Map the identifier to its actual memory address */
     target = get_var(varName, vars);
-
-    /* Abort operation if the variable was out of bounds (handled by get_var) */
     if (target == NULL)
         return NULL;
 
-    /* Fast-forward through any spaces immediately following the command */
+    /* --- Stage 2: Comma Validation --- */
+
+    /* Fast-forward to locate the mandatory separating comma */
     skip_spaces(p);
 
-    if (**p == '\0' || **p == '\n')
-    {
-        printf("Missing parameter\n");
+    /* Ensure the command didn't end before the comma, and verify the comma exists */
+    if (check_missing_parameter(**p))
         return NULL;
-    }
-    if (**p != ',')
-    {
-        printf("Missing comma\n");
+    if (check_missing_comma(**p))
         return NULL;
-    }
+
+    /* Hop over the valid comma */
     (*p)++;
 
-    /* Fast-forward through any spaces immediately following the command */
+    /* --- Stage 3: Number Extraction --- */
+
+    /* Fast-forward past the comma to locate the real number */
     skip_spaces(p);
 
-    if (**p == ',')
-    {
-        printf("Multiple consecutive commas\n");
+    /* Reject multiple consecutive commas (e.g., "A,,5") and check for unexpected EOF */
+    if (check_multiple_comma(**p))
         return NULL;
-    }
-
-    if (**p == '\0' || **p == '\n')
-    {
-        printf("Missing parameter\n");
+    if (check_missing_parameter(**p))
         return NULL;
-    }
 
+    /* Attempt to extract a double-precision floating-point number */
     n1 = strtod(*p, &endptr);
 
+    /* If the pointer didn't move, no valid number was found */
     if (*p == endptr)
     {
         printf("Invalid parameter - not a number\n");
         return NULL;
     }
+
+    /* Advance the main parsing pointer past the extracted number */
     *p = endptr;
 
-    /* Skip any trailing spaces after the valid variable */
+    /* --- Stage 4: Final Validation --- */
+
+    /* Fast-forward past the number to inspect the end of the line */
     skip_spaces(p);
 
-    /* * Validate that nothing else was typed after the variable.
-     * This strictly catches garbage text or illegal trailing commas (e.g., "print_comp A ,").
-     */
-    if (**p != '\n' && **p != '\0')
-    {
-        printf("Extraneous text after end of command\n");
+    /* Guarantee no additional arguments or garbage text follow the number */
+    if (check_extraneous_text(**p))
         return NULL;
-    }
 
+    /* All validations passed - export the number and return the variable pointer */
     *n1_out = n1;
     return target;
 }
@@ -266,6 +493,38 @@ complex *extract_single_arg(char **p, complex *vars[])
 
     /* All validations passed - return the safely extracted variable */
     return target;
+}
+
+/*
+ * check_missing_comma:
+ * Validates that the current character is have comma.
+ * Used to enforce strict syntax in commands that do not accept multiple parameters.
+ * Returns: 1 if an illegal comma is detected (and prints an error), 0 otherwise.
+ */
+int check_missing_comma(char c)
+{
+    if (c != ',')
+    {
+        printf("Missing comma\n");
+        return 1;
+    }
+    return 0;
+}
+
+/*
+ * check_multiple_comma:
+ * Validates that the current character is not have multiple comma.
+ * Used to enforce strict syntax in commands that do not accept multiple parameters.
+ * Returns: 1 if an illegal comma is detected (and prints an error), 0 otherwise.
+ */
+int check_multiple_comma(char c)
+{
+    if (c == ',')
+    {
+        printf("Multiple consecutive commas\n");
+        return 1;
+    }
+    return 0;
 }
 
 /*
