@@ -1,0 +1,4 @@
+read_comp A, 1.0, 1.0                                                                                                        this is a very long line of garbage text that exceeds the 100 character limit of our array and should trigger our buffer overflow protection mechanism perfectly
+read_comp B, 2.0, 2.0
+add_comp A, B
+stop

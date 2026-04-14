@@ -37,8 +37,7 @@ int main(void)
     char line[MAX], command[MAX], extra[MAX];
     double n1, n2;
     int args;
-    char *p;
-    int offset;
+    char *p, *comma_ptr;
 
     /* Initialize the pointer map for O(1) variable access via ASCII math*/
     vars[0] = &A;
@@ -58,16 +57,38 @@ int main(void)
             break; /* Handle EOF */
         }
 
+        if (strchr(line, '\n') == NULL && !feof(stdin))
+        {
+            int ch;
+            printf("Error: Command line exceeds maximum length of %d characters\n", MAX - 1);
+
+            while ((ch = getchar()) != '\n' && ch != EOF)
+            {
+            }
+            continue;
+        }
+
         printf("You entered: %s", line);
 
         /* Extract the command verb. Skip empty lines (Ghost line fix). */
-        if (sscanf(line, "%s%n", command, &offset) < 1)
+        if (sscanf(line, "%s", command) != 1)
             continue;
 
+        comma_ptr = strchr(command, ',');
+        if (comma_ptr != NULL)
+        {
+            *comma_ptr = '\0';
+            if (isValidCommand(command) == TRUE)
+            {
+                printf("Illegal comma\n");
+                continue;
+            }
+            *comma_ptr = ',';
+        }
         if (isValidCommand(command) == FALSE)
             continue;
 
-        p = line + offset;
+        p = strstr(line, command) + strlen(command);
 
         /* --- Command Routing & Parsing ---*/
         if (strcmp(command, "stop") == 0)

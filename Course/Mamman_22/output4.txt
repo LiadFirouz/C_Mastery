@@ -1,0 +1,5 @@
+Enter command: Error: Command line exceeds maximum length of 99 characters
+Enter command: You entered: read_comp B, 2.0, 2.0
+Enter command: You entered: add_comp A, B
+2.00 + (2.00)i
+Enter command: You entered: stop

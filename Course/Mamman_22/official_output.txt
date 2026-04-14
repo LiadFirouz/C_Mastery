@@ -1,0 +1,72 @@
+Enter command: You entered: read_comp G, 3.1, 6.5
+Undefined complex variable
+Enter command: You entered: read_comp a, 3.6, 5.1
+Undefined complex variable
+Enter command: You entered: do_it A, B
+Undefined command name
+Enter command: You entered: Add_Comp A, C
+Undefined command name
+Enter command: You entered: read_comp A, 3.5, xyz
+Invalid parameter - not a number
+Enter command: You entered: read_comp A, 3.5
+Missing parameter
+Enter command: You entered: read_comp A, 3.5, -3,
+Extraneous text after end of command
+Enter command: You entered: add_comp B
+Missing parameter
+Enter command: You entered: print_comp C, D
+Extraneous text after end of command
+Enter command: You entered: sub_comp F, , D
+Multiple consecutive commas
+Enter command: You entered: mult_comp_comp F D
+Missing comma
+Enter command: You entered: mult_comp_real, A, 2.5
+Illegal comma
+Enter command: You entered: mult_comp_img A, B
+Invalid parameter - not a number
+Enter command: You entered: abs_comp
+Missing parameter
+Enter command: You entered: abs_comp 2.5
+Undefined complex variable
+Enter command: You entered: stop A
+Extraneous text after end of command
+Enter command: You entered: print_comp A
+0.00 + (0.00)i
+Enter command: You entered: print_comp B
+0.00 + (0.00)i
+Enter command: You entered: print_comp C
+0.00 + (0.00)i
+Enter command: You entered: read_comp A, 45.1, -23.75
+Enter command: You entered: print_comp A
+45.10 + (-23.75)i
+Enter command: You entered: read_comp B, 54.2, 3.56
+Enter command: You entered: print_comp B
+54.20 + (3.56)i
+Enter command: You entered: read_comp C, 0, -1
+Enter command: You entered: print_comp C
+0.00 + (-1.00)i
+Enter command: You entered: add_comp A, B
+99.30 + (-20.19)i
+Enter command: You entered: sub_comp C, A
+-45.10 + (22.75)i
+Enter command: You entered: sub_comp B, B
+0.00 + (0.00)i
+Enter command: You entered: sub_comp D, A
+-45.10 + (23.75)i
+Enter command: You entered: mult_comp_real A, 2.51
+113.20 + (-59.61)i
+Enter command: You entered: mult_comp_img A, -2.564
+-60.90 + (-115.64)i
+Enter command: You entered: mult_comp_comp A, B
+2528.97 + (-1126.69)i
+Enter command: You entered: mult_comp_comp E ,  C
+0.00 + (0.00)i
+Enter command: You entered: abs_comp A
+50.97
+Enter command: You entered: abs_comp B
+54.32
+Enter command: You entered: abs_comp C
+1.00
+Enter command: You entered: abs_comp F
+0.00
+Enter command: You entered: stop

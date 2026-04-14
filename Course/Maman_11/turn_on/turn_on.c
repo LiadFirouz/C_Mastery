@@ -8,7 +8,7 @@
 
 #include <stdio.h>
 
-#define TOTAL_BITS 32
+#define TOTAL_BITS sizeof(long) * 8
 #define MASK (1L << 16)
 
 long turn_on(long num);
@@ -18,27 +18,28 @@ int main(void)
 {
     long num = 0, new_num = 0;
 
-    printf("Enter a number: ");
-    scanf("%ld", &num);
-
-    printf("\nThe original number:\nBase 2: ");
-    printByte(num);
-    printf("Base 10: %ld\n", num);
-
-    new_num = turn_on(num);
-
-    if (num == new_num)
+    printf("Enter a number: \n");
+    while (scanf("%ld", &num) == 1)
     {
-        printf("\nNo change occurred\n");
-    }
-    else
-    {
-        printf("\nA change occurred\n");
-        printf("The number after change:\nBase 2: ");
-        printByte(new_num);
-        printf("Base 10: %ld\n", new_num);
-    }
+        printf("\nThe original number:\nBase 2: ");
+        printByte(num);
+        printf("Base 10: %ld\n", num);
 
+        new_num = turn_on(num);
+
+        if (num == new_num)
+        {
+            printf("\nNo change occurred\n\n");
+        }
+        else
+        {
+            printf("\nA change occurred\n");
+            printf("The number after change:\nBase 2: ");
+            printByte(new_num);
+            printf("Base 10: %ld\n\n", new_num);
+        }
+        printf("Enter a number: \n");
+    }
     return 0;
 }
 

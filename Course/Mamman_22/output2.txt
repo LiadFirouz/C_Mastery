@@ -1,0 +1,11 @@
+Enter command: You entered: read_compA, 2.5, -3.0
+Undefined command name
+Enter command: You entered: read_comp A,2.5,-3.0
+Enter command: You entered: read_comp B    ,   1   ,   1
+Enter command: You entered: add_comp A,, B
+Multiple consecutive commas
+Enter command: You entered: sub_comp A, B,
+Extraneous text after end of command
+Enter command: You entered: print_comp C
+0.00 + (0.00)i
+Enter command: You entered: stop

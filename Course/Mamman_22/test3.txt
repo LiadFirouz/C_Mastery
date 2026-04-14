@@ -1,0 +1,6 @@
+read_comp G, 1.0, 2.0
+read_comp A, 1.0xyz, 2.0
+read_comp B, 1.0, 2.0.5
+mult_comp_real A, -
+stop extra_text
+stop

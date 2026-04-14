@@ -1,0 +1,8 @@
+
+
+
+ThisLineHasAbsolutelyNoSpaces
+A   B   C   D   E
+    Leading spaces only
+Trailing spaces only        
+ 	 	 Mixed tabs and spaces

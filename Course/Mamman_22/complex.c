@@ -18,7 +18,7 @@ void read_comp(complex *c, double r, double i)
 /* Prints a complex number strictly in the format: real+(imaginary)i */
 void print_comp(complex c)
 {
-    printf("%.2f+(%.2f)i\n", c.real, c.imaginary);
+    printf("%.2f + (%.2f)i\n", c.real, c.imaginary);
 }
 
 /* Addition: (a+bi) + (c+di) = (a+c) + (b+d)i */

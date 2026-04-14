@@ -1,0 +1,64 @@
+The Input string:
+""
+The string as received by the function:
+""
+The string at the end of the function:
+""
+
+
+The Input string:
+""
+The string as received by the function:
+""
+The string at the end of the function:
+""
+
+
+The Input string:
+""
+The string as received by the function:
+""
+The string at the end of the function:
+""
+
+
+The Input string:
+"ThisLineHasAbsolutelyNoSpaces"
+The string as received by the function:
+"ThisLineHasAbsolutelyNoSpaces"
+The string at the end of the function:
+"ThisLineHasAbsolutelyNoSpaces"
+
+
+The Input string:
+"A   B   C   D   E"
+The string as received by the function:
+"A   B   C   D   E"
+The string at the end of the function:
+"ABCDE"
+
+
+The Input string:
+"    Leading spaces only"
+The string as received by the function:
+"    Leading spaces only"
+The string at the end of the function:
+"Leadingspacesonly"
+
+
+The Input string:
+"Trailing spaces only        "
+The string as received by the function:
+"Trailing spaces only        "
+The string at the end of the function:
+"Trailingspacesonly"
+
+
+The Input string:
+" 	 	 Mixed tabs and spaces"
+The string as received by the function:
+" 	 	 Mixed tabs and spaces"
+The string at the end of the function:
+"Mixedtabsandspaces"
+
+

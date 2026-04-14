@@ -1,0 +1,7 @@
+aaa bbb ccc d e f 
+NoSpacesHereAtAll!
+   Leading and trailing spaces   
+	Tabs	and spaces mixed
+ 
+		
+A string with just one space at the end

@@ -1,0 +1,15 @@
+Enter command: You entered: read_comp A, 2.5, -3.0
+Enter command: You entered: read_comp B, -1.0, 4.0
+Enter command: You entered: add_comp A, B
+1.50 + (1.00)i
+Enter command: You entered: sub_comp A, B
+3.50 + (-7.00)i
+Enter command: You entered: mult_comp_real A, 2
+5.00 + (-6.00)i
+Enter command: You entered: mult_comp_img B, -3
+12.00 + (3.00)i
+Enter command: You entered: mult_comp_comp A, B
+9.50 + (13.00)i
+Enter command: You entered: abs_comp A
+3.91
+Enter command: You entered: stop

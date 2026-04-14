@@ -1,0 +1,11 @@
+Enter command: You entered: read_comp G, 1.0, 2.0
+Undefined complex variable
+Enter command: You entered: read_comp A, 1.0xyz, 2.0
+Missing comma
+Enter command: You entered: read_comp B, 1.0, 2.0.5
+Extraneous text after end of command
+Enter command: You entered: mult_comp_real A, -
+Invalid parameter - not a number
+Enter command: You entered: stop extra_text
+Extraneous text after end of command
+Enter command: You entered: stop
