@@ -1,7 +1,12 @@
 /*
- * mycomp.c
- * * The main interactive shell for the complex number calculator.
- * Responsible for command routing, string parsing, and robust input validation.
+ * ============================================================================
+ * Name: Liad Firouz
+ * ID: 209187699
+ * File: mycomp.c
+ * Description: The main interactive shell for the complex number calculator.
+ * Responsible for command routing, string parsing, and robust
+ * input validation.
+ * ============================================================================
  */
 #include <stdio.h>
 #include <stdlib.h>

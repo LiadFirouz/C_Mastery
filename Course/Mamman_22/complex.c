@@ -1,8 +1,12 @@
 /*
- * complex.c
- * * Implementation of the mathematical operations for complex numbers.
- * Uses the DRY (Don't Repeat Yourself) principle by utilizing read_comp
- * and print_comp inside the arithmetic functions.
+ * ============================================================================
+ * Name: Liad Firouz
+ * ID: 209187699
+ * File: complex.c
+ * Description: Implementation of the mathematical operations and utility
+ * functions for complex numbers. This file contains the core
+ * arithmetic logic defined in the complex.h interface.
+ * ============================================================================
  */
 #include "complex.h"
 #include <stdio.h>

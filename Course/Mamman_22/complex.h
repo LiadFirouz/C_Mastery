@@ -1,7 +1,12 @@
 /*
- * complex.h
- * * Header file defining the 'complex' structure and the mathematical API.
- * Acts as the blueprint for the complex number math engine.
+ * ============================================================================
+ * Name: Liad Firouz
+ * ID: 209187699
+ * File: complex.h
+ * Description: Header file defining the 'complex' data structure and declaring
+ * the mathematical API for complex number operations. Acts as
+ * the interface blueprint for the complex math engine.
+ * ============================================================================
  */
 #ifndef COMPLEX_H
 #define COMPLEX_H
