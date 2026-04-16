@@ -1,0 +1,1 @@
+zip -r maman11_Liad_Firouz.zip remove_blanks turn_on -x "*.o" "*.DS_Store" "*__MACOSX*"
